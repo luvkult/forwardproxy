@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
+	utls "github.com/refraction-networking/utls"
 	"encoding/base64"
 	"errors"
 	"io"
@@ -204,21 +205,22 @@ func (c *HTTPConnectDialer) DialContext(ctx context.Context, network, address st
 				return nil, err
 			}
 		} else {
-			tlsConf := tls.Config{
+			rawTCP, err := c.Dialer.DialContext(ctx, network, c.ProxyURL.Host)
+			if err != nil {
+				return nil, err
+			}
+			uConfig := &utls.Config{
 				NextProtos: []string{"h2", "http/1.1"},
 				ServerName: c.ProxyURL.Hostname(),
-				MinVersion: tls.VersionTLS12,
+				MinVersion: utls.VersionTLS12,
 			}
-			tlsConn, err := tls.Dial(network, c.ProxyURL.Host, &tlsConf)
-			if err != nil {
+			uConn := utls.UClient(rawTCP, uConfig, utls.HelloChrome_Auto)
+			if err := uConn.Handshake(); err != nil {
+				rawTCP.Close()
 				return nil, err
 			}
-			err = tlsConn.Handshake()
-			if err != nil {
-				return nil, err
-			}
-			negotiatedProtocol = tlsConn.ConnectionState().NegotiatedProtocol
-			rawConn = tlsConn
+			negotiatedProtocol = uConn.ConnectionState().NegotiatedProtocol
+			rawConn = uConn
 		}
 	default:
 		return nil, errors.New("scheme " + c.ProxyURL.Scheme + " is not supported")
