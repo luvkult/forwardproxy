@@ -1,7 +1,10 @@
 name: Build
 on:
   push:
-    branches: [naive]
+    branches: [naive, utls]
+    paths-ignore: [README.md]
+  pull_request:
+    branches: [utls]
     paths-ignore: [README.md]
   release:
     types: [published]
