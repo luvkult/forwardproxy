@@ -19,9 +19,8 @@ package httpclient
 import (
 	"bufio"
 	"context"
-	"crypto/tls"
-	utls "github.com/refraction-networking/utls"
 	"encoding/base64"
+	utls "github.com/refraction-networking/utls"
 	"errors"
 	"io"
 	"net"
