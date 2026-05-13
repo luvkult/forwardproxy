@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/caddyserver/caddy/v2 v2.8.4
 	github.com/refraction-networking/utls v1.8.2
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.28.0
 	golang.org/x/net v0.38.0
 )
 
